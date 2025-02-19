@@ -1,4 +1,6 @@
+
 const apiUrl = 'https://dummyjson.com/products';
+
 
 // Biến lưu trữ tất cả sản phẩm
 let allProducts = [];
@@ -58,5 +60,34 @@ function renderProducts(products) {
 
 
 fetchProducts();
+
+// tim kiếm sản phẩm
+
+// Lắng nghe sự kiện click vào nút tìm kiếm
+document.querySelector("#search button").addEventListener("click", function () {
+    const query = document.querySelector("#search input").value.trim().toLowerCase();
+    timkiem(query);
+});
+
+// Hàm tìm kiếm sản phẩm theo từ khóa
+function timkiem(query) {
+    if (query === "") {
+        renderProducts(allProducts); // Nếu không nhập gì, hiển thị tất cả sản phẩm
+        return;
+    }
+    
+    const filteredProducts = allProducts.filter(product =>
+        product.title.toLowerCase().includes(query)
+    );
+
+    renderProducts(filteredProducts); // Hiển thị danh sách đã lọc
+}
+
+// Để bấm Enter cũng có thể tìm kiếm, bạn có thể thêm:
+document.querySelector("#search input").addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+        document.querySelector("#search button").click();
+    }
+});
 
 
