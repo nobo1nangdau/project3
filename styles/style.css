@@ -66,3 +66,52 @@ header {
 .product p {
     color: #555;
 }
+
+/* tim kiem */
+#search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto;
+    padding: 10px;
+    max-width: 400px;
+    background: #b4c5d6;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#search input {
+    flex: 1;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#search input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+#search button {
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#search button:hover {
+    background: #b3003c;
+}
+
+#search button:active {
+    transform: scale(0.95);
+}
