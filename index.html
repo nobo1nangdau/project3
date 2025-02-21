@@ -19,7 +19,8 @@
         <header>
             <h1>Danh sách sản phẩm</h1>
         </header>
-
+        
+        <!-- tim kiem san pham  -->
         <div class="search" id="search">
             <input type="text">
             <button>Tim Kiếm</button>
@@ -28,6 +29,29 @@
         <main>
             <div id="product-list"></div>
         </main>
+        
+        <!-- sap xep -->
+        <div id="sort-filter">
+            <label for="sort">Sắp xếp theo : </label>
+            <select name="" id="sort">
+                <option value="default">Mặc định</option>
+                <option value="lowToHigh">Giá: Thấp đến Cao </option>
+                <option value="highToLow">Giá: Cao đến Thấp</option>
+                <option value="discount">Giảm giá nhiều nhất</option>
+            </select>
+        </div>
+
+
+        <!-- phan trang san pham  -->
+        <div id="pagination">
+            <button id="prevPage"> Trang trước </button>
+            <span id="pageNumber">1</span>
+            <button id="nextPage"> Trang sau </button>
+        </div>
+
+        
+
+
     </div>
 
 

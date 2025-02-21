@@ -1,89 +1,112 @@
 
+
+
 const apiUrl = 'https://dummyjson.com/products';
 
-
-// Biến lưu trữ tất cả sản phẩm
+// Biến lưu trữ tất cả sản phẩm và danh sách sản phẩm đang hiển thị
 let allProducts = [];
+let filteredProducts = []; // Lưu danh sách hiện tại sau khi lọc hoặc tìm kiếm
+let currentPage = 1;
+const productsPerPage = 6; // Số sản phẩm mỗi trang
 
-// Fetch products va lưu vào allProducts
+// Fetch danh sách sản phẩm từ API
 async function fetchProducts() {
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        console.log(data.products); // In toàn bộ danh sách sản phẩm ra console
-
-        allProducts = data.products; // Lưu sản phẩm vào biến allProducts
-        renderProducts(data.products); // hien thi danh sach sản phẩm ban đầu
+        allProducts = data.products;
+        filteredProducts = allProducts; // Ban đầu, hiển thị tất cả sản phẩm
+        renderProducts();
     } catch (error) {
         console.error('Error fetching products:', error);
     }
 }
+fetchProducts();
 
-
-// lọc và hiển thị sản phẩm theo danh muc
-function filterProducts(category) {
-    if(category == 'ALL'){
-        renderProducts(allProducts); // hien thi tat ca san pham
-    } else {
-        const filteredProducts = allProducts.filter (product => product.category === category);
-        renderProducts(filteredProducts); // hien thi san pham theo danh muc
-    }
-}
-
-// gán sự kiện cho các nút danh mục
-document.getElementById('category-filter').addEventListener('click', (event) => {
-    if(event.target.tagName === 'BUTTON') {
-        const category = event.target.dataset.category;
-        filterProducts(category);
-    }
-});
-
-
-function renderProducts(products) {
+// Hàm hiển thị sản phẩm
+function renderProducts() {
     const productList = document.getElementById('product-list');
     productList.innerHTML = '';
 
-    products.forEach(product => {
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const endIndex = startIndex + productsPerPage;
+    const productsToShow = filteredProducts.slice(startIndex, endIndex); // Lấy danh sách hiển thị
+
+    productsToShow.forEach(product => {
         const productDiv = document.createElement('div');
         productDiv.className = 'product';
-
         productDiv.innerHTML = `
             <img src="${product.thumbnail}" alt="${product.title}">
             <h2>${product.title}</h2>
             <p>Price: $${product.price}</p>
         `;
-
         productList.appendChild(productDiv);
     });
+
+    updatePagination();
 }
 
+// Cập nhật trạng thái phân trang
+function updatePagination() {
+    document.getElementById('pageNumber').textContent = currentPage;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage * productsPerPage >= filteredProducts.length;
+}
 
+// Xử lý sự kiện chuyển trang
+document.getElementById('prevPage').addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderProducts();
+    }
+});
 
-fetchProducts();
+document.getElementById('nextPage').addEventListener('click', () => {
+    if (currentPage * productsPerPage < filteredProducts.length) {
+        currentPage++;
+        renderProducts();
+    }
+});
 
-// tim kiếm sản phẩm
+// Lọc sản phẩm theo danh mục
+function filterProducts(category) {
+    currentPage = 1;
+    if (category === 'ALL') {
+        filteredProducts = allProducts;
+    } else {
+        filteredProducts = allProducts.filter(product => product.category === category);
+    }
+    renderProducts();
+}
+
+// Gán sự kiện click cho các nút danh mục
+document.getElementById('category-filter').addEventListener('click', (event) => {
+    if (event.target.tagName === 'BUTTON') {
+        const category = event.target.dataset.category;
+        filterProducts(category);
+    }
+});
+
+// Tìm kiếm sản phẩm theo từ khóa
+function timKiem(query) {
+    currentPage = 1;
+    if (query === "") {
+        filteredProducts = allProducts;
+    } else {
+        filteredProducts = allProducts.filter(product =>
+            product.title.toLowerCase().includes(query)
+        );
+    }
+    renderProducts();
+}
 
 // Lắng nghe sự kiện click vào nút tìm kiếm
 document.querySelector("#search button").addEventListener("click", function () {
     const query = document.querySelector("#search input").value.trim().toLowerCase();
-    timkiem(query);
+    timKiem(query);
 });
 
-// Hàm tìm kiếm sản phẩm theo từ khóa
-function timkiem(query) {
-    if (query === "") {
-        renderProducts(allProducts); // Nếu không nhập gì, hiển thị tất cả sản phẩm
-        return;
-    }
-    
-    const filteredProducts = allProducts.filter(product =>
-        product.title.toLowerCase().includes(query)
-    );
-
-    renderProducts(filteredProducts); // Hiển thị danh sách đã lọc
-}
-
-// Để bấm Enter cũng có thể tìm kiếm, bạn có thể thêm:
+// Cho phép tìm kiếm khi nhấn Enter
 document.querySelector("#search input").addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
         document.querySelector("#search button").click();
@@ -91,3 +114,33 @@ document.querySelector("#search input").addEventListener("keypress", function (e
 });
 
 
+
+// sắp xếp theo giá
+
+// xử lý sự kiên khi thay đổi lựa chọn sắp xếp
+document.getElementById('sort').addEventListener('change', function(){
+    const sortBy = this.value;
+    sortProducts(sortBy);
+});
+
+// hàm sắp xếp sản phẩm
+function sortProducts(sortBy){
+    let sortedProducts = [...filteredProducts]; // tao bản sao để không làm thay đổi dữ liệu gốc
+    switch(sortBy) {
+        case 'lowToHigh':
+            sortedProducts.sort((a, b) => a.price - b.price);
+            break;
+        case 'highToLow':
+            sortedProducts.sort((a, b) => b.price - a.price);
+            break;
+        case 'discount':
+            sortedProducts.sort((a, b) => b.discountPercentage  - a.discountPercentage);
+            break;
+        default:
+            sortedProducts = [...allProducts]; // quay ve danh sach goc
+            break;
+    }
+    filteredProducts = sortedProducts; // cap nhat danh sach da loc
+    currentPage = 1; // reset ve trang 1 khi sap xep
+    renderProducts(sortedProducts)
+}
