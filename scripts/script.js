@@ -144,3 +144,4 @@ function sortProducts(sortBy){
     currentPage = 1; // reset ve trang 1 khi sap xep
     renderProducts(sortedProducts)
 }
+
